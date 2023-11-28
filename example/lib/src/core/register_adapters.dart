@@ -4,5 +4,6 @@ import 'package:hive_local_storage/hive_local_storage.dart';
 
 void registerAdapters() {
   Hive.registerAdapter(AnotherModelAdapter());
+  Hive.registerAdapter(AnothorAModelAdapter());
   Hive.registerAdapter(ModelAdapter());
 }

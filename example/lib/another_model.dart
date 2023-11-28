@@ -4,3 +4,6 @@ part 'another_model.g.dart';
 
 @HiveType(typeId: 1)
 class AnotherModel {}
+
+@HiveType(typeId: 2)
+class AnothorAModel {}

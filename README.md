@@ -1,4 +1,5 @@
 # Type Register Generator
+[![pub package](https://img.shields.io/pub/v/type_register.svg)](https://pub.dev/packages/type_register)   
 
 Code generator for creating helper functions for registering Hive types. It will generate method named registerAdapters with all the hive adapters for the types annotated with @HiveType.
 

@@ -25,7 +25,12 @@ class TypeRegisterBuilder implements Builder {
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    String hiveImport = await _parseHiveImport(buildStep);
+    final hiveImport = await _parseHiveImport(buildStep);
+    if (hiveImport == null || hiveImport.isEmpty) {
+      log.warning(
+          'hive or hive_generator is not in dependencies or dev_dependencies. please add hive or hive_local_storage to dependencies and hive_generator to dev_dependencies in pubspec.yaml.');
+      return;
+    }
 
     /// parse output path from build.yaml
     final outputPath = options.config['output_path'] as String;
@@ -63,11 +68,16 @@ class TypeRegisterBuilder implements Builder {
       }
     }
 
-    final imports = files.map((e) => Directive.import(e.uri)).toList();
+    /// generate unique imports
+    final uniqueImports = <String>{};
+    for (var element in files) {
+      uniqueImports.add(element.uri);
+    }
+    final imports = uniqueImports.map((uri) => Directive.import(uri)).toList();
     imports.add(Directive.import(hiveImport));
     imports.sort((a, b) => a.compareTo(b));
 
-    final library = Library(
+    var library = Library(
       (builder) => builder
         ..directives.addAll(imports)
         ..body.addAll(
@@ -79,7 +89,6 @@ class TypeRegisterBuilder implements Builder {
           ],
         ),
     );
-
     final emitter = DartEmitter(
       orderDirectives: true,
       useNullSafetySyntax: true,
@@ -97,22 +106,22 @@ class TypeRegisterBuilder implements Builder {
     };
   }
 
-  FutureOr<String> _parseHiveImport(BuildStep buildStep) async {
+  FutureOr<String?> _parseHiveImport(BuildStep buildStep) async {
+    String? hiveImport;
     final pubspecYaml = await buildStep
         .readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
     final pubspec = loadYaml(pubspecYaml) as Map;
     final dependenciesMap = pubspec['dependencies'] as Map;
+    final devDependenciesMap = pubspec['dev_dependencies'] as Map;
 
-    String hiveImport = '';
+    if (!devDependenciesMap.containsKey('hive_generator')) {
+      return null;
+    }
 
     if (dependenciesMap.containsKey('hive')) {
       hiveImport = 'package:hive/hive.dart';
     } else if (dependenciesMap.containsKey('hive_local_storage')) {
       hiveImport = 'package:hive_local_storage/hive_local_storage.dart';
-    }
-    if (hiveImport.isEmpty) {
-      throw Exception(
-          'You must add `hive` or `hive_local_storage` to your pubspec.yaml');
     }
     return hiveImport;
   }

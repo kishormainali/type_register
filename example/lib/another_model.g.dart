@@ -30,3 +30,28 @@ class AnotherModelAdapter extends TypeAdapter<AnotherModel> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class AnothorAModelAdapter extends TypeAdapter<AnothorAModel> {
+  @override
+  final int typeId = 2;
+
+  @override
+  AnothorAModel read(BinaryReader reader) {
+    return AnothorAModel();
+  }
+
+  @override
+  void write(BinaryWriter writer, AnothorAModel obj) {
+    writer.writeByte(0);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AnothorAModelAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
