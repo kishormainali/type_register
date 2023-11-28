@@ -79,9 +79,22 @@ class TypeRegisterBuilder implements Builder {
 
     var library = Library(
       (builder) => builder
+        ..comments.addAll([
+          'GENERATED CODE - DO NOT MODIFY BY HAND',
+          'ignore_for_file: lines_longer_than_80_chars',
+        ])
         ..directives.addAll(imports)
         ..body.addAll(
           [
+            const Code('\n'),
+            const Code(
+                '//*****************************************************************************'),
+            const Code('\n'),
+            const Code('// Type Adapters'),
+            const Code('\n'),
+            const Code(
+                '//*****************************************************************************'),
+            const Code('\n'),
             const Code('void registerAdapters(){'),
             ...files
                 .map((e) => Code('Hive.registerAdapter(${e.adapterName}());')),
