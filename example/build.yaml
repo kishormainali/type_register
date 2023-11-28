@@ -1,0 +1,6 @@
+targets:
+  $default:
+    builders:
+      type_register|type_register:
+        options:
+          output_path: lib/src/core/

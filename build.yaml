@@ -1,0 +1,11 @@
+
+builders:
+  type_register:
+    import: 'package:type_register/type_register.dart'
+    builder_factories: ['registerAdapters']
+    build_extensions: {'$package$': ['{{dir}}/register_adapters.dart']}
+    auto_apply: dependents
+    build_to: source
+    defaults:
+      options:
+        output_path: lib/
