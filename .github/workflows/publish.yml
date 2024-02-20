@@ -44,4 +44,4 @@ jobs:
         run: dart analyze .
 
       - name: 🚀 Publish package
-        run: dart pub publish -f%
+        run: dart pub publish -f
