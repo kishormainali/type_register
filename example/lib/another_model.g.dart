@@ -31,7 +31,7 @@ class AnotherModelAdapter extends TypeAdapter<AnotherModel> {
           typeId == other.typeId;
 }
 
-class AnothorAModelAdapter extends TypeAdapter<AnothorAModel> {
+class ModelAAdapter extends TypeAdapter<AnothorAModel> {
   @override
   final int typeId = 2;
 
@@ -51,7 +51,7 @@ class AnothorAModelAdapter extends TypeAdapter<AnothorAModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AnothorAModelAdapter &&
+      other is ModelAAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

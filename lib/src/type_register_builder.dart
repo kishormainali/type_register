@@ -27,8 +27,7 @@ class TypeRegisterBuilder implements Builder {
   FutureOr<void> build(BuildStep buildStep) async {
     final hiveImport = await _parseHiveImport(buildStep);
     if (hiveImport == null || hiveImport.isEmpty) {
-      log.warning(
-          'hive or hive_generator is not in dependencies or dev_dependencies. please add hive or hive_local_storage to dependencies and hive_generator to dev_dependencies in pubspec.yaml.');
+      log.warning('hive or hive_generator is not in dependencies or dev_dependencies. please add hive or hive_local_storage to dependencies and hive_generator to dev_dependencies in pubspec.yaml.');
       return;
     }
 
@@ -45,8 +44,7 @@ class TypeRegisterBuilder implements Builder {
     final files = <Adapter>[];
     await for (final input in buildStep.findAssets(_allFilesInLib)) {
       final library = await buildStep.resolver.libraryFor(input);
-      final classesInLibrary = LibraryReader(library)
-          .annotatedWith(const TypeChecker.fromRuntime(HiveType));
+      final classesInLibrary = LibraryReader(library).annotatedWith(const TypeChecker.fromRuntime(HiveType));
       final sortedClasses = classesInLibrary.toList()
         ..sort((a, b) {
           final aTypeId = a.annotation.read('typeId').intValue;
@@ -54,16 +52,19 @@ class TypeRegisterBuilder implements Builder {
           return aTypeId.compareTo(bTypeId);
         });
       for (final model in sortedClasses) {
-        final adapterName = model.annotation.read('adapterName').isNull
-            ? null
-            : model.annotation.read('adapterName').stringValue;
+        final adapterName = model.annotation.read('adapterName').literalValue as String?;
         if (adapterName != null && adapterName.isNotEmpty) {
-          files.add(
-              Adapter(adapterName: adapterName, uri: input.uri.toString()));
+          files.add(Adapter(
+            name: model.element.name!,
+            adapterName: adapterName,
+            uri: input.uri.toString(),
+          ));
         } else {
           files.add(Adapter(
-              adapterName: '${model.element.name}Adapter',
-              uri: input.uri.toString()));
+            name: model.element.name!,
+            adapterName: '${model.element.name}Adapter',
+            uri: input.uri.toString(),
+          ));
         }
       }
     }
@@ -82,22 +83,15 @@ class TypeRegisterBuilder implements Builder {
         ..comments.addAll([
           'GENERATED CODE - DO NOT MODIFY BY HAND',
           'ignore_for_file: lines_longer_than_80_chars',
+          '******************************************************************',
+          'Type Adapters',
+          '******************************************************************'
         ])
         ..directives.addAll(imports)
         ..body.addAll(
           [
-            const Code('\n'),
-            const Code(
-                '//*****************************************************************************'),
-            const Code('\n'),
-            const Code('// Type Adapters'),
-            const Code('\n'),
-            const Code(
-                '//*****************************************************************************'),
-            const Code('\n'),
             const Code('void registerAdapters(){'),
-            ...files
-                .map((e) => Code('Hive.registerAdapter(${e.adapterName}());')),
+            ...files.map((file) => Code('Hive.registerAdapter<${file.name}>(${file.adapterName}());')),
             const Code('}'),
           ],
         ),
@@ -121,8 +115,7 @@ class TypeRegisterBuilder implements Builder {
 
   FutureOr<String?> _parseHiveImport(BuildStep buildStep) async {
     String? hiveImport;
-    final pubspecYaml = await buildStep
-        .readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
+    final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
     final pubspec = loadYaml(pubspecYaml) as Map;
     final dependenciesMap = pubspec['dependencies'] as Map;
     final devDependenciesMap = pubspec['dev_dependencies'] as Map;

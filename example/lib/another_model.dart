@@ -5,5 +5,5 @@ part 'another_model.g.dart';
 @HiveType(typeId: 1)
 class AnotherModel {}
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 2, adapterName: 'ModelAAdapter')
 class AnothorAModel {}

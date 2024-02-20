@@ -1,3 +1,7 @@
+# 1.0.3
+- added type parameter on `registerAdapter` method
+- updated min dart sdk version to 3.2.6
+
 # 1.0.2
 - added comments on generated code
 

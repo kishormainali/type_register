@@ -6,9 +6,13 @@ import 'package:equatable/equatable.dart';
 class Adapter extends Equatable {
   /// {@macro adapter}
   const Adapter({
+    required this.name,
     required this.adapterName,
     required this.uri,
   });
+
+  /// name of model
+  final String name;
 
   /// name of the adapter extracted from the annotation
   final String adapterName;
@@ -18,9 +22,9 @@ class Adapter extends Equatable {
 
   @override
   String toString() {
-    return 'Adapter(adapterName: $adapterName, uri: $uri)';
+    return 'Adapter(name:$name,adapterName: $adapterName, uri: $uri)';
   }
 
   @override
-  List<Object?> get props => [adapterName, uri];
+  List<Object?> get props => [name, adapterName, uri];
 }
