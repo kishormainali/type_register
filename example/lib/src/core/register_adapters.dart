@@ -9,7 +9,8 @@ import 'package:example/model.dart';
 import 'package:hive_local_storage/hive_local_storage.dart';
 
 void registerAdapters() {
-  Hive.registerAdapter<AnotherModel>(AnotherModelAdapter());
-  Hive.registerAdapter<AnothorAModel>(ModelAAdapter());
-  Hive.registerAdapter<Model>(ModelAdapter());
+  Hive
+    ..registerAdapter<AnotherModel>(AnotherModelAdapter())
+    ..registerAdapter<AnothorAModel>(ModelAAdapter())
+    ..registerAdapter<Model>(ModelAdapter());
 }

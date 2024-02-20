@@ -1,6 +1,6 @@
 name: type_register
 description: Generator which generates method named registerAdapters with all the hive adapters for the types annotated with @HiveType.
-version: 1.0.3
+version: 1.0.4
 topics:
   - type-register-generator
   - dart

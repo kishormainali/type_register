@@ -91,7 +91,9 @@ class TypeRegisterBuilder implements Builder {
         ..body.addAll(
           [
             const Code('void registerAdapters(){'),
-            ...files.map((file) => Code('Hive.registerAdapter<${file.name}>(${file.adapterName}());')),
+            const Code('Hive'),
+            ...files.map((file) => Code('..registerAdapter<${file.name}>(${file.adapterName}())')),
+            const Code(';'),
             const Code('}'),
           ],
         ),

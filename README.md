@@ -9,6 +9,7 @@ Add the following to your pubspec.yaml file:
 
 ```yaml
 dev_dependencies:
+  hive_generator: latest
   type_register: latest
 ```
 
@@ -41,7 +42,7 @@ import 'package:example/model.dart';
 import 'package:hive_local_storage/hive_local_storage.dart'; 
 
 void registerAdapters() {
-  Hive.registerAdapter(AnotherModelAdapter());
-  Hive.registerAdapter(ModelAdapter());
+  Hive..registerAdapter<AnotherModel>(AnotherModelAdapter())
+      ..registerAdapter<Model>(ModelAdapter());
 }
 ```
