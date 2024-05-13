@@ -6,10 +6,13 @@ import 'package:equatable/equatable.dart';
 class Adapter extends Equatable {
   /// {@macro adapter}
   const Adapter({
+    required this.typeId,
     required this.name,
     required this.adapterName,
     required this.uri,
   });
+
+  final int typeId;
 
   /// name of model
   final String name;
@@ -26,5 +29,5 @@ class Adapter extends Equatable {
   }
 
   @override
-  List<Object?> get props => [name, adapterName, uri];
+  List<Object?> get props => [typeId, name, adapterName, uri];
 }

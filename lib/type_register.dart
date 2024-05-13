@@ -6,4 +6,5 @@ import 'package:build/build.dart';
 import 'src/type_register_builder.dart';
 
 /// Builder for type register.
-Builder registerAdapters(BuilderOptions options) => TypeRegisterBuilder(options);
+Builder registerAdapters(BuilderOptions options) =>
+    TypeRegisterBuilder(options);

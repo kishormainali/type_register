@@ -12,12 +12,21 @@ class ModelAdapter extends TypeAdapter<Model> {
 
   @override
   Model read(BinaryReader reader) {
-    return Model();
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Model(
+      name: fields[0] as String,
+    );
   }
 
   @override
   void write(BinaryWriter writer, Model obj) {
-    writer.writeByte(0);
+    writer
+      ..writeByte(1)
+      ..writeByte(0)
+      ..write(obj.name);
   }
 
   @override

@@ -27,7 +27,8 @@ class TypeRegisterBuilder implements Builder {
   FutureOr<void> build(BuildStep buildStep) async {
     final hiveImport = await _parseHiveImport(buildStep);
     if (hiveImport == null || hiveImport.isEmpty) {
-      log.warning('hive or hive_generator is not in dependencies or dev_dependencies. please add hive or hive_local_storage to dependencies and hive_generator to dev_dependencies in pubspec.yaml.');
+      log.warning(
+          'hive or hive_generator is not in dependencies or dev_dependencies. please add hive or hive_local_storage to dependencies and hive_generator to dev_dependencies in pubspec.yaml.');
       return;
     }
 
@@ -43,29 +44,32 @@ class TypeRegisterBuilder implements Builder {
     /// extract all classes annotated with @HiveType
     final files = <Adapter>[];
     await for (final input in buildStep.findAssets(_allFilesInLib)) {
-      final library = await buildStep.resolver.libraryFor(input);
-      final classesInLibrary = LibraryReader(library).annotatedWith(const TypeChecker.fromRuntime(HiveType));
-      final sortedClasses = classesInLibrary.toList()
-        ..sort((a, b) {
-          final aTypeId = a.annotation.read('typeId').intValue;
-          final bTypeId = b.annotation.read('typeId').intValue;
-          return aTypeId.compareTo(bTypeId);
-        });
-      for (final model in sortedClasses) {
-        final adapterName = model.annotation.read('adapterName').literalValue as String?;
-        if (adapterName != null && adapterName.isNotEmpty) {
-          files.add(Adapter(
-            name: model.element.name!,
-            adapterName: adapterName,
-            uri: input.uri.toString(),
-          ));
-        } else {
-          files.add(Adapter(
-            name: model.element.name!,
-            adapterName: '${model.element.name}Adapter',
-            uri: input.uri.toString(),
-          ));
+      if (await buildStep.resolver.isLibrary(input)) {
+        final libraryElement = await buildStep.resolver.libraryFor(input);
+        final annotatedClasses = LibraryReader(libraryElement)
+            .annotatedWith(const TypeChecker.fromRuntime(HiveType));
+        for (final model in annotatedClasses) {
+          final adapterName =
+              model.annotation.read('adapterName').literalValue as String?;
+          final typeId = model.annotation.read('typeId').intValue;
+          if (adapterName != null && adapterName.isNotEmpty) {
+            files.add(Adapter(
+              typeId: typeId,
+              name: model.element.name!,
+              adapterName: adapterName,
+              uri: input.uri.toString(),
+            ));
+          } else {
+            files.add(Adapter(
+              typeId: typeId,
+              name: model.element.name!,
+              adapterName: '${model.element.name}Adapter',
+              uri: input.uri.toString(),
+            ));
+          }
         }
+      } else {
+        continue;
       }
     }
 
@@ -77,6 +81,7 @@ class TypeRegisterBuilder implements Builder {
     final imports = uniqueImports.map((uri) => Directive.import(uri)).toList();
     imports.add(Directive.import(hiveImport));
     imports.sort((a, b) => a.compareTo(b));
+    files.sort((a, b) => a.typeId.compareTo(b.typeId));
 
     var library = Library(
       (builder) => builder
@@ -92,7 +97,8 @@ class TypeRegisterBuilder implements Builder {
           [
             const Code('void registerAdapters(){'),
             const Code('Hive'),
-            ...files.map((file) => Code('..registerAdapter<${file.name}>(${file.adapterName}())')),
+            ...files.map(
+                (file) => Code('..registerAdapter(${file.adapterName}())')),
             const Code(';'),
             const Code('}'),
           ],
@@ -117,7 +123,8 @@ class TypeRegisterBuilder implements Builder {
 
   FutureOr<String?> _parseHiveImport(BuildStep buildStep) async {
     String? hiveImport;
-    final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
+    final pubspecYaml = await buildStep
+        .readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
     final pubspec = loadYaml(pubspecYaml) as Map;
     final dependenciesMap = pubspec['dependencies'] as Map;
     final devDependenciesMap = pubspec['dev_dependencies'] as Map;
